@@ -12,9 +12,22 @@ class CoreDataProvider {
     var context : NSManagedObjectContext{
         persistantContainer.viewContext
     }
-    
+    static var preview : CoreDataProvider = {
+        let provider = CoreDataProvider(inMemory: true)
+        let context = provider.context
+        let celeb = Budget(context: context)
+        celeb.title = "BirthDay"
+        celeb.amount = 250.0
+        celeb.dateCreated = Date()
+        do {
+            try context.save()
+        }catch {
+            fatalError()
+        }
+        return provider
+    }()
     init(inMemory : Bool = false) {
-        self.persistantContainer = NSPersistentContainer(name: "MoneyManageModel")
+        self.persistantContainer = NSPersistentContainer(name: "MoneyManage")
         if (inMemory){
             persistantContainer.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
         }

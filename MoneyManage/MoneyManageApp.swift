@@ -10,14 +10,14 @@ import SwiftUI
 @main
 struct MoneyManageApp: App {
     
-    let provider : CoreDataProvider
-    init() {
-        provider = CoreDataProvider()
-    }
+    let provider = CoreDataProvider()
+  
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationStack{
+                BudgetListScreen()
+            }
                 .environment(\.managedObjectContext, provider.persistantContainer.viewContext)
         }
     }
