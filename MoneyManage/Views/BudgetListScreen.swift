@@ -14,7 +14,7 @@ struct BudgetListScreen : View {
     var body: some View {
         VStack{
             List (budgets){ budget in
-                Text("\(budget.title ?? "")")
+                BudgetCellView(budget: budget)
             }
         }.navigationTitle("Budgets")
             .toolbar{
@@ -25,7 +25,7 @@ struct BudgetListScreen : View {
                 }
             }
             .sheet(isPresented: $isPresented) {
-                AddBudgetScreen()
+                AddBudgetScreen() .presentationDetents([.medium])
             }
     }
 }
@@ -35,3 +35,5 @@ struct BudgetListScreen : View {
     }
     .environment(\.managedObjectContext,CoreDataProvider.preview.context)
 }
+
+

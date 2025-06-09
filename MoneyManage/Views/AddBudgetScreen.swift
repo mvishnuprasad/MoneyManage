@@ -10,8 +10,20 @@ import SwiftUI
 struct AddBudgetScreen: View {
     @State private var title : String = ""
     @State private var limit : Double?
+    @Environment(\.managedObjectContext) private var context
     private var isFormValid : Bool {
-        title.isEmptyOrSpace && limit != nil && Double(limit!) > 0
+        !title.isEmptyOrSpace && limit != nil && Double(limit!) > 0
+    }
+    private func save() {
+        let budget = Budget(context: context)
+        budget.title = title
+        budget.amount = limit ?? 0
+        budget.dateCreated = Date()
+        do {
+            try context.save()
+        }catch{
+            print("Error Saving")
+        }
     }
     var body: some View {
         Form {
@@ -23,6 +35,11 @@ struct AddBudgetScreen: View {
             TextField("Limit",value: $limit,format: .number)
                 .keyboardType(.numberPad)
             Button {
+                if !Budget.exists(context: context, title: title){
+                    save()
+                }else{
+                    
+                }
                 
             } label: {
                 Text("Save")
@@ -39,4 +56,5 @@ struct AddBudgetScreen: View {
 
 #Preview {
     AddBudgetScreen()
+        .environment(\.managedObjectContext,CoreDataProvider.preview.context)
 }
