@@ -23,7 +23,6 @@ struct BudgetDetailScreen: View {
     }
     init(budget: Budget) {
         self.budget = budget
-        //        _expenses = FetchRequest(entity: Expense.entity(),sortDescriptors: [],predicate:NSPredicate(format: "budget == %@", budget))
         let request: NSFetchRequest<Expense> = Expense.fetchRequest()
         request.predicate = NSPredicate(format: "budget == %@", budget)
         request.sortDescriptors = [NSSortDescriptor(keyPath: \Expense.dateCreated, ascending: false)]
@@ -39,11 +38,25 @@ struct BudgetDetailScreen: View {
         do {
             try context.save()
         }catch{
+            fatalError()
+        }
+    }
+    private func delete(index: IndexSet){
+        index.forEach { index in
+            let expense = expenses[index]
+            context.delete(expense)
+            do {
+                try context.save()
+            }catch{
+                fatalError()
+            }
         }
     }
     let budget : Budget
     var body: some View {
         Form{
+            
+            Text(budget.amount, format:  .currency(code: Locale.currencyCode ))
             Section("New Expense"){
                 TextField("Title", text: $title)
                 TextField("Limit",value: $amount,format: .number)
@@ -65,27 +78,29 @@ struct BudgetDetailScreen: View {
                 List{
                     VStack (alignment: .leading){
                         HStack {
-                            Text("Total Budget")
+                            Text("Round Total")
+                                .font(.callout)
                             Spacer()
                             Text(total, format:  .currency(code: Locale.currencyCode ))
                         }
                         HStack {
                             Text("Remaining Budget")
+                                .font(.callout)
                             Spacer()
                             Text(remaining, format:  .currency(code: Locale.currencyCode ))
                                 .foregroundStyle(remaining<0 ? .red : .green)
+                                .font(.callout)
                         }
                     }
                     ForEach (expenses){ expense in
-                        HStack{
-                            Text(expense.title ?? "")
-                            Spacer()
-                            Text(expense.amount, format:  .currency(code: Locale.currencyCode))
-                        }
+                        ExpenseCellView(expense: expense)
+                    }.onDelete { index in
+                        delete(index: index)
                     }
                 }
             }
         }.navigationTitle(budget.title ?? "")
+            .navigationBarTitleDisplayMode(.large)
     }
 }
 
@@ -102,3 +117,5 @@ struct BudgetContainer : View {
     BudgetContainer()
         .environment(\.managedObjectContext, CoreDataProvider.preview.context)
 }
+
+
