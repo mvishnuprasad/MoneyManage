@@ -18,7 +18,7 @@ struct MoneyManageApp: App {
             NavigationStack{
                 BudgetListScreen()
             }
-                .environment(\.managedObjectContext, provider.persistantContainer.viewContext)
+            .environment(\.managedObjectContext, provider.context)
         }
     }
 }

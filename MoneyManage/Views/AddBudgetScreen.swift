@@ -9,15 +9,13 @@ import SwiftUI
 
 struct AddBudgetScreen: View {
     @State private var title : String = ""
-    @State private var limit : Double?
+    @State private var amount : Double?
     @Environment(\.managedObjectContext) private var context
-    private var isFormValid : Bool {
-        !title.isEmptyOrSpace && limit != nil && Double(limit!) > 0
-    }
+
     private func save() {
         let budget = Budget(context: context)
         budget.title = title
-        budget.amount = limit ?? 0
+        budget.amount = amount ?? 0
         budget.dateCreated = Date()
         do {
             try context.save()
@@ -32,7 +30,7 @@ struct AddBudgetScreen: View {
                 .font(.headline)
             TextField("Title",text: $title)
                 .presentationDetents([.medium])
-            TextField("Limit",value: $limit,format: .number)
+            TextField("Limit",value: $amount,format: .number)
                 .keyboardType(.numberPad)
             Button {
                 if !Budget.exists(context: context, title: title){
@@ -46,7 +44,7 @@ struct AddBudgetScreen: View {
                     .frame(maxWidth:.infinity)
             }
             .buttonStyle(.borderedProminent)
-            .disabled(!isFormValid)
+            .disabled(!Budget.isFormValid(title: title, amount: amount))
             .presentationDetents([.medium])
             
             

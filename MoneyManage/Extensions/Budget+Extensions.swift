@@ -19,4 +19,8 @@ extension  Budget {
             fatalError()
         }
     }
+    static func isFormValid(title: String,amount: Double?) ->  Bool {
+       return  !title.isEmptyOrSpace && amount != nil && Double(amount!) > 0
+    }
+     
 }

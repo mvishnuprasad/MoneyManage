@@ -2,7 +2,7 @@
 //  BudgetCellView.swift
 //  MoneyManage
 //
-//  Created by qbuser on 09/06/25.
+//  Created by vishnuprasad on 09/06/25.
 //
 
 import Foundation
