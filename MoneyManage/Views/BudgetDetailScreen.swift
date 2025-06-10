@@ -6,11 +6,35 @@
 //
 
 import SwiftUI
-
+import CoreData
 struct BudgetDetailScreen: View {
     @State private var title : String = ""
     @State private var amount : Double?
-    
+    @Environment(\.managedObjectContext) private var context
+    @Environment(\.dismiss) var dismiss
+    @FetchRequest(sortDescriptors: []) private var expenses : FetchedResults<Expense>
+    init(budget: Budget) {
+        
+        self.budget = budget
+//        _expenses = FetchRequest(entity: Expense.entity(),sortDescriptors: [],predicate:NSPredicate(format: "budget == %@", budget))
+        let request: NSFetchRequest<Expense> = Expense.fetchRequest()
+                request.predicate = NSPredicate(format: "budget == %@", budget)
+                request.sortDescriptors = [NSSortDescriptor(keyPath: \Expense.dateCreated, ascending: false)]
+                _expenses = FetchRequest(fetchRequest: request)
+    }
+    private func addExpense() {
+        let expense = Expense(context: context)
+        expense.title = title
+        expense.amount = amount ?? 0.0
+        expense.dateCreated = Date()
+        budget.addToExpenses(expense)
+        do {
+           try context.save()
+        }catch{
+            
+        }
+        
+    }
     let budget : Budget
     var body: some View {
         Form{
@@ -18,11 +42,27 @@ struct BudgetDetailScreen: View {
                 TextField("Title", text: $title)
                 TextField("Limit",value: $amount,format: .number)
                     .keyboardType(.numberPad)
-                Button(action: {}) {
+                Button(action: {
+                    addExpense()
+                    title = ""
+                    amount = 0.0
+                    dismiss()
+                    
+                }) {
                     Text("Save")
                         .frame(maxWidth:.infinity)
                 }.buttonStyle(.borderedProminent)
                     .disabled(!Budget.isFormValid(title: title, amount: amount))
+            }
+            
+            Section("Expnses") {
+                List (expenses){ expense in
+                    HStack{
+                        Text(expense.title ?? "")
+                        Spacer() 
+                        Text(expense.amount, format:  .currency(code: Locale.current.currency?.identifier ?? "$"))
+                    }
+                }
             }
         }.navigationTitle(budget.title ?? "")
     }

@@ -11,6 +11,7 @@ import SwiftUI
 struct BudgetListScreen : View {
     @State private var isPresented : Bool = false
     @FetchRequest(sortDescriptors: []) private var budgets : FetchedResults<Budget>
+    
     var body: some View {
         VStack{
             List (budgets){ budget in
@@ -25,6 +26,8 @@ struct BudgetListScreen : View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Add Budget"){
                         isPresented = true
+                        
+                        
                     }
                 }
             }
